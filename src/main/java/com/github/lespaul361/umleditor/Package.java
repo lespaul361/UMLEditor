@@ -5,18 +5,18 @@
  */
 package com.github.lespaul361.umleditor;
 
-import java.beans.PropertyChangeSupport;
-import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
  * @author David Hamilton
  */
-public class Package {
+public final class Package implements DefaultMethods {
 
-    private String packageName;
+    private String packageName = "";
     public static final String PROP_PACKAGENAME = "packageName";
-    private final transient PropertyChangeSupport propertyChangeSupport = new java.beans.PropertyChangeSupport(this);
+    private final List<UMLClass> umlClasses = new ArrayList<>(100);
 
     private Package(String name) {
         this.packageName = name;
@@ -25,29 +25,58 @@ public class Package {
     private Package() {
     }
 
+    /**
+     * Creates an instance of a {@link Package}
+     *
+     * @param name the name of the package (ex. com.name.packagename)
+     * @return the new Package
+     */
     public static Package getPackageInstance(String name) {
         return new Package(name);
     }
 
-    public static Package getPackageInstance(File fileName) {
-        return null;
-    }    ;
-
-    /**
-     * @return the packageName
-     */
-    public String getPackageName() {
+    @Override
+    public String getName() {
         return packageName;
     }
 
-    /**
-     * @param packageName the packageName to set. Use full qualified names such
-     * as com.username.package
-     */
-    public void setPackageName(String packageName) {
-        java.lang.String oldPackageName = this.packageName;
-        this.packageName = packageName;
-        propertyChangeSupport.firePropertyChange(PROP_PACKAGENAME, oldPackageName, packageName);
+    @Override
+    public void setName(String name) {
+        if (name == null) {
+            throw new NullPointerException("Package name cannot be null");
+        }
+        if (name.isEmpty()) {
+            throw new IllegalArgumentException("Package name cannot be empty");
+        }
+        this.packageName = name;
     }
 
+    /**
+     * Adds a class extending {@link UMLClass}
+     *
+     * @param umlClass a class extending {@link UMLClass}
+     */
+    public void addUMLClass(UMLClass umlClass) {
+        this.umlClasses.add(umlClass);
+    }
+
+    /**
+     * Removes a {@link UMLClass} from the package
+     *
+     * @param umlClass the class to remove
+     * @return true if class was found and removed
+     */
+    public boolean remove(UMLClass umlClass) {
+        return umlClasses.remove(umlClass);
+    }
+
+    /**
+     * Removes a {@link UMLClass} from the package
+     *
+     * @param index the index to the class to remove
+     * @return the UMLClass removed
+     */
+    public UMLClass remove(int index) {
+        return umlClasses.remove(index);
+    }
 }
